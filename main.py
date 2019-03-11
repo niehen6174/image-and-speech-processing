@@ -25,7 +25,7 @@ import wave
 from configparser import ConfigParser
 
 conf=ConfigParser()  #
-conf.read('config.conf')#读取配置文件 获取一些参数
+conf.read('config.conf', encoding='gbk')#读取配置文件 获取一些参数
 CAPTURE_SOURCE=conf.get('image_config','capture_source')
 TOLERANCE=float(conf.get('image_config','tolerance'))
 SET_SIZE=float(conf.get('image_config','set_size'))
@@ -563,7 +563,7 @@ class MineWindow4(QMainWindow,Ui_Dialog2): # ui_mainwindow2 是baiduyuyin这个u
         self.pushButton_3.clicked.connect(self.search_infor)
         self.pushButton_24.clicked.connect(self.new_register)
         self.conf = ConfigParser()
-        self.conf.read('information.conf')
+        self.conf.read('information.conf', encoding='gbk')
     def close_clear(self):
         linetext=[self.lineEdit,self.lineEdit_13,self.lineEdit_14,self.lineEdit_15,self.lineEdit_16,self.lineEdit_17,
                   self.lineEdit_18,self.lineEdit_20]
