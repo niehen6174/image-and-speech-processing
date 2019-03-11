@@ -267,7 +267,7 @@ class MyMainWindow(QMainWindow,Ui_MainWindow):
     def show_picture(self):  #  在人脸识别的右边显示 识别出来人的详细信息
          if self.video_btn==1:
              conf = ConfigParser()
-             conf.read('information.conf')
+             conf.read('information.conf', encoding='gbk')
              inforation={}
              for names in conf.sections():
                 more_infor={}
@@ -509,7 +509,7 @@ class MineWindow3(QMainWindow,Ui_Dialog): # ui_mainwindow2 是baiduyuyin这个ui
         self.lineEdit_12.setPlaceholderText("**************")
     def change_config(self):
         conf = ConfigParser()
-        conf.read('config.conf') #打开配置文件
+        conf.read('config.conf', encoding='gbk') #打开配置文件
         button=0
         source_text=self.lineEdit_7.text()
         size_text=self.lineEdit_8.text()
