@@ -76,6 +76,8 @@ class MyMainWindow(QMainWindow,Ui_MainWindow):
         else:
             self.close()
     def btn_open_cam_click(self):  #打开摄像头 按钮函数
+        if CAPTURE_SOURCE=='0':
+            CAPTURE_SOURCE=int(CAPTURE_SOURCE)
 
 
         self.source = CAPTURE_SOURCE
