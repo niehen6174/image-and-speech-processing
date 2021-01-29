@@ -1,23 +1,23 @@
 import sys  #
-import face_recognition  #人脸识别模块
-import os  #可以用来打开文件
-from xlutils.copy import copy   # 记录在记录信息的时候用
-import xlrd    # 计入excel
-from os import listdir,getcwd  # 地址 用于打开位置
-import cv2  #打开摄像头
-import threading  #多线程
+import face_recognition  
+import os  
+from xlutils.copy import copy   
+import xlrd    
+from os import listdir,getcwd  
+import cv2  
+import threading 
 from PyQt5.QtWidgets import QApplication ,QMainWindow,QMessageBox,QFileDialog,QLabel
 from PyQt5.QtCore import QBasicTimer,pyqtSignal,Qt,QSize,QThread
 from PyQt5.QtGui import *
-from datetime import datetime  #可以用于获取当前的时间
-from time import time   #用于计算时间差 可以用来计算一个模块运行的时间
-from speech_synthesis_ui import Ui_MainWindow2  # 第二个界面用于 语音合成
+from datetime import datetime  
+from time import time  
+from speech_synthesis_ui import Ui_MainWindow2 
 from speech_reco_ui import Ui_MainWindow3
 from register import Ui_Dialog2
-from setting2_ui import Ui_Dialog #设置界面
-from new_ui import Ui_MainWindow  # 主窗体ui代码
-from baiduyuyin import baidu_voice,baidu_speech_reco ,ping  #百度语音合成模块
-from PIL import Image, ImageDraw, ImageFont #与cv2 进行转换PIl可以显示汉字cv2不行
+from setting2_ui import Ui_Dialog 
+from new_ui import Ui_MainWindow  
+from baiduyuyin import baidu_voice,baidu_speech_reco ,ping  
+from PIL import Image, ImageDraw, ImageFont 
 import numpy as np
 import qtawesome
 import pyaudio
@@ -25,16 +25,16 @@ import wave
 from configparser import ConfigParser
 
 conf=ConfigParser()  #
-conf.read('config.conf', encoding='gbk')#读取配置文件 获取一些参数
+conf.read('config.conf', encoding='gbk')
 CAPTURE_SOURCE=conf.get('image_config','capture_source')
 TOLERANCE=float(conf.get('image_config','tolerance'))
 SET_SIZE=float(conf.get('image_config','set_size'))
 print(CAPTURE_SOURCE,TOLERANCE,SET_SIZE)
 t=time()
 class MyMainWindow(QMainWindow,Ui_MainWindow):
-    signal=pyqtSignal()  #初始化信号  为了实现双重界面
+    signal=pyqtSignal() 
     signal2=pyqtSignal()
-    signal3=pyqtSignal() #设置界面的信号
+    signal3=pyqtSignal() 
     signal4=pyqtSignal()
     def __init__(self,parent=None):
         super(MyMainWindow,self).__init__(parent)
@@ -47,20 +47,20 @@ class MyMainWindow(QMainWindow,Ui_MainWindow):
 
 # 信号槽设置  ------------------------------
 
-        self.left_close.clicked.connect(self.close_window)  #关闭窗口
-        self.left_mini.clicked.connect(self.showMinimized)#最小化窗口
-        #self.left_visit.clicked.connect(self.showMaximized)  #最大化窗口
-        self.pushButton_8.clicked.connect(self.btn_open_cam_click) # 对打开摄像头1 按钮进行连接函数  lamda
-        self.pushButton_4.clicked.connect(self.face_recognition_btn) # 人脸识别按钮连接函数 调用face_recogniton_btn
-        self.pushButton_5.clicked.connect(self.photo_face)  # 拍照按钮 连接函数
-        self.pushButton_3.clicked.connect(self.signal_emit) #连接发射信号的函数打开第二个窗口
-        self.left_button_6.clicked.connect(self.signal_speech_reco)  #打开语音识别的窗口
-        self.pushButton.clicked.connect(self.signal_register)  # 显示信息 打开文件夹  self.open_file
-        self.pushButton_2.clicked.connect(self.open_record)  # 显示记录 连接打开记录的函数
-        self.pushButton_9.clicked.connect(self.video_announce)  #语音播报
-        self.left_button_9.clicked.connect(self.signal_setting)  #设置
+        self.left_close.clicked.connect(self.close_window)  
+        self.left_mini.clicked.connect(self.showMinimized)
+        #self.left_visit.clicked.connect(self.showMaximized)  
+        self.pushButton_8.clicked.connect(self.btn_open_cam_click) 
+        self.pushButton_4.clicked.connect(self.face_recognition_btn) 
+        self.pushButton_5.clicked.connect(self.photo_face)  
+        self.pushButton_3.clicked.connect(self.signal_emit) 
+        self.left_button_6.clicked.connect(self.signal_speech_reco)  
+        self.pushButton.clicked.connect(self.signal_register) 
+        self.pushButton_2.clicked.connect(self.open_record)  
+        self.pushButton_9.clicked.connect(self.video_announce)  
+        self.left_button_9.clicked.connect(self.signal_setting)  
         print('mainwindow  is running')
-        self.progressbarr_move()  # 一个假的进度条 一直在运行 不过到 打开人脸识别按钮的时候它才会变化
+        self.progressbarr_move()  
         self.show()
 # 信号槽对应的函数
 
@@ -83,10 +83,10 @@ class MyMainWindow(QMainWindow,Ui_MainWindow):
 
         self.source = CAPTURE_SOURCE
         self.t3=time()
-        flag2=self.cap.isOpened()  #判断摄像头是否被打开 如果被打开flag2就是ture反之就是false
+        flag2=self.cap.isOpened() 
         #print(flag2,' flag')
         if flag2 == False:
-             # 使用海康威视网络摄像头
+             
             self.cap.open(self.source)
 
             try:
@@ -97,7 +97,7 @@ class MyMainWindow(QMainWindow,Ui_MainWindow):
             print('关闭摄像头')
 
             # self.timer_camera.stop()
-            self.cap.release()   # 关闭摄像头 对cap进行释放
+            self.cap.release()  
             #
             self.pushButton_8.setText(u'打开摄像头')
             #self.label_5 = QLabel('\n\nImage and Speech\n\nProcessing')
@@ -106,7 +106,7 @@ class MyMainWindow(QMainWindow,Ui_MainWindow):
             self.label_5.setText('Image and Speech\n\nProcessing')
             #
         #self.qingping()
-    def face_recognition_btn(self):  # 人脸识别按钮  通过video_btn的值来控制
+    def face_recognition_btn(self):  #
         flag2=self.cap.isOpened()
         if flag2== False:
             QMessageBox.information(self, "Warning",
@@ -121,17 +121,17 @@ class MyMainWindow(QMainWindow,Ui_MainWindow):
                 #由于
             elif self.video_btn==1:
                 self.video_btn=0
-                self.time_step=0  #进度条初始化 当下次打开人脸识别的时候  再次打开进度条
+                self.time_step=0 
                 self.pushButton_4.setText(u'人脸识别')
                 self.qingping()
                 self.show_camera()
                 self.qingping()
-    def progressbarr_move(self):  #使用这个函数和下面的timerEvent(QBasicTimer自带的构造函数) 使得在打卡人脸识别的时候有一个进度条
+    def progressbarr_move(self): 
         self.timer = QBasicTimer()
         self.step = 0
         self.timer.start(100, self)
-    def timerEvent(self, e):  #这个进度条并不是实际意义上的进度条  我弄了好久发现我想要的那种效果根本实现不了  又不忍心删掉 就用了一种比较不太好的方法实现了进度条
-                               #在初始化ui的时候进度条已经开始了不过我没有让他变化 等到打开了人脸识别的开关就开始了变化等到 成为了100%就瞬间变成0
+    def timerEvent(self, e):  #
+                              
         if self.step >= 100:
           #time.sleep(3) 尝试休眠 但起不到效果
             self.progressBar.setValue(0)
@@ -146,16 +146,16 @@ class MyMainWindow(QMainWindow,Ui_MainWindow):
             self.step=self.step
         self.progressBar.setValue(self.step)
 
-    def show_camera(self):  #展示摄像头画面并进行人脸识别的功能
+    def show_camera(self):  
         #print('show_camera is open ')
-        if self.video_btn==0:    #在前面就设置了video_btn为0 为了在人脸识别的时候直接把这个值给改了 这样人脸识别和摄像头展示就分开了
+        if self.video_btn==0:   
 
             self.pushButton_8.setText(u'关闭摄像头')
 
             while (self.cap.isOpened()):
 
                 ret, self.image = self.cap.read()
-                QApplication.processEvents()  #这句代码告诉QT处理来处理任何没有被处理的事件，并且将控制权返回给调用者  让代码变的没有那么卡
+                QApplication.processEvents()  
                 show = cv2.resize(self.image, (800, 494))
                 show = cv2.cvtColor(show,cv2.COLOR_BGR2RGB)  # 这里指的是显示原图
                 # opencv 读取图片的样式，不能通过Qlabel进行显示，需要转换为Qimage QImage(uchar * data, int width,
@@ -164,7 +164,7 @@ class MyMainWindow(QMainWindow,Ui_MainWindow):
 
               #  因为他最后会存留一张 图像在lable上需要对 lable_5进行清理
             self.label_5.setPixmap(QPixmap(""))
-            print('打开摄像头时间',time()-self.t3)
+            print('打开摄像头时间',time()-self.t3
 
         elif self.video_btn==1:
             #这段代码是 获取photo文件夹中 人的信息
@@ -174,10 +174,10 @@ class MyMainWindow(QMainWindow,Ui_MainWindow):
              known_face_encodings=[]
              a=0
              print('2')
-             for filename in filename_list:#依次读入列表中的内容
+             for filename in filename_list:
                 a+=1
                 QApplication.processEvents()
-                if filename.endswith('jpg'):# 后缀名'jpg'匹对
+                if filename.endswith('jpg'):
                     known_face_names.append(filename[:-4])#把文件名字的后四位.jpg去掉获取人名
                     file_str='photo'+'/'+filename
                     a_images=face_recognition.load_image_file(file_str)
@@ -185,8 +185,7 @@ class MyMainWindow(QMainWindow,Ui_MainWindow):
                     a_face_encoding = face_recognition.face_encodings(a_images)[0]
                     known_face_encodings.append(a_face_encoding)
              print(known_face_names,a)
-            #knowe_face_names里面放着每个人的名字   known_face_encodings里面放着提取出来的每个人的人脸特征信息
-
+           
              face_locations = []
              face_encodings = []
              face_names =[]
@@ -202,7 +201,7 @@ class MyMainWindow(QMainWindow,Ui_MainWindow):
                  #print('4 is running')
                  if process_this_frame:
                      QApplication.processEvents()
-                        # 根据encoding来判断是不是同一个人，是就输出true，不是为flase
+                        
                      face_locations = face_recognition.face_locations(rgb_small_frame)
                      face_encodings = face_recognition.face_encodings(rgb_small_frame, face_locations)
                      face_names = []
@@ -211,7 +210,7 @@ class MyMainWindow(QMainWindow,Ui_MainWindow):
                             # 默认为unknown
                          matches = face_recognition.compare_faces(known_face_encodings, face_encoding,tolerance=TOLERANCE)
                             #阈值太低容易造成无法成功识别人脸，太高容易造成人脸识别混淆 默认阈值tolerance为0.6
-                            #print(matches)
+                           
                          name = "Unknown"
                          if True in matches:
                              first_match_index = matches.index(True)
@@ -219,15 +218,15 @@ class MyMainWindow(QMainWindow,Ui_MainWindow):
 
                          face_names.append(name)
                  process_this_frame = not process_this_frame
-                    # 将捕捉到的人脸显示出来
+                    
                  self.set_name=set(face_names)
                  self.set_names=tuple(self.set_name) # 把名字先设为了一个 集合 把重复的去掉 再设为tuple 以便于下面显示其他信息和记录 调用
                  voice_syn=str()
-                 print(self.set_names) #把人脸识别检测到的人 用set_names 这个集合收集起来
-                 self.write_record() #把名字记录到excel中去
-                 #self.video_announce()
+                 print(self.set_names) 
+                 self.write_record() 
+                
                  for (top, right, bottom, left), name in zip(face_locations, face_names):
-                        #由于我们检测到的帧被缩放到1/4大小，所以要缩小面位置
+                        
                      top *= int(1/SET_SIZE)
                      right *=int(1/SET_SIZE)
                      bottom *= int(1/SET_SIZE)
@@ -236,13 +235,12 @@ class MyMainWindow(QMainWindow,Ui_MainWindow):
                      cv2.rectangle(frame, (left, top), (right, bottom), (60, 20, 220), 3)
 
                      print('face recognition is running')
-                        #def draw_text(self, image, pos, text, text_size, text_color)
-                     #由于 opencv无法显示汉字 之前使用的方法当照片很小时会报错，此次采用了另一种方法使用PIL进行转换
-                     cv2img = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB) # cv2和PIL中颜色的hex码的储存顺序不同
+                       
+                     cv2img = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB) 
                      pilimg = Image.fromarray(cv2img)
                      draw = ImageDraw.Draw(pilimg) # 图片上打印
-                     font = ImageFont.truetype("msyh.ttf", 27, encoding="utf-8") # 参数1：字体文件路径，参数2：字体大小
-                     draw.text((left+10 , bottom ), name, (220, 20, 60), font=font) # 参数1：打印坐标，参数2：文本，参数3：字体颜色，参数4：字体
+                     font = ImageFont.truetype("msyh.ttf", 27, encoding="utf-8") 
+                     draw.text((left+10 , bottom ), name, (220, 20, 60), font=font) 
 
                     # PIL图片转cv2 图片
                      frame = cv2.cvtColor(np.array(pilimg), cv2.COLOR_RGB2BGR)
@@ -257,7 +255,7 @@ class MyMainWindow(QMainWindow,Ui_MainWindow):
              print('打开人脸识别所需要的时间',time()-self.t2)
 
 
-    def photo_face(self):  #实现保存截图的功能 图片保存在了 video_screenshot 文件夹里面  名字是根据时间命名
+    def photo_face(self):  
         photo_save_path = os.path.join(os.path.dirname(os.path.abspath('__file__')),
                                        'video_screenshot/')
         # self.time_flag.append(datetime.now().strftime("%Y%m%d%H%M%S")
@@ -267,7 +265,7 @@ class MyMainWindow(QMainWindow,Ui_MainWindow):
         QMessageBox.information(self, "Information",
                                 self.tr("拍照成功!"))
 
-    def show_picture(self):  #  在人脸识别的右边显示 识别出来人的详细信息
+    def show_picture(self):  
          if self.video_btn==1:
              conf = ConfigParser()
              conf.read('information.conf', encoding='gbk')
@@ -279,10 +277,10 @@ class MyMainWindow(QMainWindow,Ui_MainWindow):
 
                 inforation[names]=more_infor
              #fr = open("information.txt",'rb')  #读取information.txt中的信息  里面是录入信息时写入的
-             infor_dic = inforation   #从information.txt文件中读取的str转换为字
+             infor_dic = inforation   
              #fr.close()
              photo_message={0:[self.label_2,self.label_7],1:[self.label,self.label_6],2:[self.label_3,self.label_4]}
-             #使用photo_message  记录出现人物数以及需要放置的lable 使用下面的遍历 来达到效果
+            
              if len(self.set_names)>3:
                  show_person=3
              else:
@@ -293,7 +291,7 @@ class MyMainWindow(QMainWindow,Ui_MainWindow):
                          person_name=self.set_names[person]   #识别出人物的名字
                          person_infor=photo_message[person][0] #信息所对应的lable
                          person_photo=photo_message[person][1] #照片所对对应的lable
-                         infor_names=infor_dic[person_name] #从txt文档中获取的 该人的信息
+                         infor_names=infor_dic[person_name] 
                          name_str='photo//'+person_name+'.jpg'
                          picture=QPixmap(name_str)
 
@@ -301,21 +299,21 @@ class MyMainWindow(QMainWindow,Ui_MainWindow):
 
                          person_infor.setText(infor_str)
                          person_infor.setStyleSheet("color:white;font-size:20px;font-family:Microsoft YaHei;")
-                         person_infor.setWordWrap(True)  #自适应大小换行
-                         person_photo.setPixmap(picture)  #把照片放到label_7上面去
-                         person_photo.setScaledContents(True)  #让照片能够在label上面自适应大小
+                         person_infor.setWordWrap(True) 
+                         person_photo.setPixmap(picture)  
+                         person_photo.setScaledContents(True)  
                      except :
                          QMessageBox.about(self,'warning','请检查'+person_name+'的信息')
 
 
              if show_person!=3:
                  for empty in range(3)[show_person:]:
-                     person_infor=photo_message[empty][0] #信息所对应的lable
-                     person_photo=photo_message[empty][1] #照片所对对应的lable
+                     person_infor=photo_message[empty][0]
+                     person_photo=photo_message[empty][1] 
                      person_infor.setText("")
                      person_photo.setPixmap(QPixmap(""))
 
-    def qingping(self):  # 不需要显示信息的时候   把显示到信息的那部分清除掉 在循环中保存了几次那些lable就不在发生变化了
+    def qingping(self):  
           self.label_7.setPixmap(QPixmap(""))  # 照片1
           self.label_2.setText("")  # 信息1
           self.label.setPixmap(QPixmap(""))
@@ -326,8 +324,8 @@ class MyMainWindow(QMainWindow,Ui_MainWindow):
 
     def signal_emit(self):
         self.signal.emit()#  信号发出
-        #baidu_voice('欢迎来到郑州轻工业大学ai人工智能实验室')
-    def signal_speech_reco(self):#进行语音合成页面的打开
+        
+    def signal_speech_reco(self):
         self.signal2.emit()
     def signal_setting(self):  #发出信号 打开新的界面
         self.signal3.emit()
@@ -336,7 +334,7 @@ class MyMainWindow(QMainWindow,Ui_MainWindow):
     def open_file(self): #下面这个路径是绝对路径 无法更改
         file_rute=getcwd()+'\\'+'photo'
         file_name = QFileDialog.getOpenFileName(self,"录入信息",file_rute)#  打开这个文件夹 选择打开的文件 phot里面的照片是打不开的 因为.py文件在外面
-        print(file_name)   # file_name 是一个返回值 类似于这种('E:/Python code/gui/hkvideo/information.txt', 'All Files (*)') 想要打开需要一些处理
+        print(file_name)   
         try:
             file_name2=list(file_name)[0] # 想要的是information，text 所以需要需要对file_name进行处理 需要注意的是打开的是 photo文件夹是向里面传照片的再返回出来 填写information
             t_file=0
@@ -359,9 +357,9 @@ class MyMainWindow(QMainWindow,Ui_MainWindow):
             print('ready to write')
             self.different_name1=self.set_name.difference(self.need_record_name1) # 获取到self.set_name有 而self.need_record_name 无的名字
             self.need_record_name1=self.set_name.union(self.need_record_name1)  # 把self.need_record_name  变成两个集合的并集
-                                        #different_name是为了获取到之前没有捕捉到的人脸  并且再次将need_recore_name1进行更新
+                                       
 
-            filename='data.xls'            #文件名准备打开excel
+            filename='data.xls'            
             book = xlrd.open_workbook(filename)  # 打开excel
             new_book = copy(book)  # 复制excel
             sheet2 = new_book.get_sheet(0)  # 获取第一个表格的数据
@@ -370,8 +368,8 @@ class MyMainWindow(QMainWindow,Ui_MainWindow):
             print("行数",nrows)
             ncols = sheet0.ncols    #获取列总数
             print("列数",ncols)
-            write_in_data=tuple(self.different_name1)  #上面的different-name1还是一个集合需要变成一个tuple
-            names_length=len(write_in_data)      # 获取到需要写入表格 人数的长度
+            write_in_data=tuple(self.different_name1)  
+            names_length=len(write_in_data)      
             for i in range(names_length):
                 #baidu_voice(write_in_data[i])  对进入的人脸进行播报
                 str_time=datetime.now().strftime("%Y-%m-%d %H:%M:%S")
@@ -384,7 +382,7 @@ class MyMainWindow(QMainWindow,Ui_MainWindow):
             os.remove(filename)  # 删除旧的excel
             os.rename('secondsheet.xls', filename)  # 将新excel重命名
 
-    def video_announce(self):  #语音播报模块  点击之后会对已经记录下来的人脸名字进行播报
+    def video_announce(self): 
         try:
             need_voice_name=list(self.need_record_name1)
         except:
@@ -411,12 +409,12 @@ class MyMainWindow(QMainWindow,Ui_MainWindow):
         os.popen('data.xls')# 使用popen会新开一个进程  而使用os.system会占用原来的进程
 
 
-class MineWindow(QMainWindow,Ui_MainWindow2): # ui_mainwindow2 是baiduyuyin这个ui里面的 为了实现双重界面 使用信号
+class MineWindow(QMainWindow,Ui_MainWindow2): 
     def __init__(self,parent=None):
         #super(MineWindow, self).__init__(None, Qt.FramelessWindowHint)  # 这句和普通的不一样 因为可以实现无边框
         super(MineWindow,self).__init__(parent)
         self.setupUi(self)
-        self.pushButton.clicked.connect(self.baidu_voice2)  #合成按钮 执行合成函数
+        self.pushButton.clicked.connect(self.baidu_voice2)  
         self.pushButton_2.clicked.connect(self.close_voice) #退出按钮 执行退出窗口
         self.pushbutton_close.clicked.connect(self.close)  #关闭窗口
         self.pushbutton_mini.clicked.connect(self.showMinimized)#最小化窗口
@@ -497,7 +495,7 @@ class MineWindow2(QMainWindow,Ui_MainWindow3): # ui_mainwindow2 是baiduyuyin这
 class MineWindow3(QMainWindow,Ui_Dialog): # ui_mainwindow2 是baiduyuyin这个ui里面的 为了实现双重界面 使用信号
 
     def __init__(self,parent=None):
-        #super(MineWindow, self).__init__(None, Qt.FramelessWindowHint)  # 这句和普通的不一样 因为可以实现无边框
+        #super(MineWindow, self).__init__(None, Qt.FramelessWindowHint)  
         super(MineWindow3,self).__init__(parent)
         self.setupUi(self)
         self.pushButton.clicked.connect(self.close)  #关闭窗口
@@ -506,7 +504,7 @@ class MineWindow3(QMainWindow,Ui_Dialog): # ui_mainwindow2 是baiduyuyin这个ui
         self.pushButton_14.clicked.connect(self.change_config)
         self.lineEdit_7.setPlaceholderText(CAPTURE_SOURCE)#摄像头地址
         self.lineEdit_8.setPlaceholderText(str(SET_SIZE)) #处理图像大小
-        self.lineEdit_9.setPlaceholderText(str(TOLERANCE)) #人脸识别阈值 阈值太低容易造成无法成功识别人脸，太高容易造成人脸识别混淆
+        self.lineEdit_9.setPlaceholderText(str(TOLERANCE)) 
         self.lineEdit_10.setPlaceholderText("**************")  #
         self.lineEdit_11.setPlaceholderText("**************")  #
         self.lineEdit_12.setPlaceholderText("**************")
@@ -657,9 +655,9 @@ class MyThread(QThread):  #录音功能需要使用到 多线程
         super().__init__(parent)
         #self.sec = sec # 默认1000秒
     def run(self):
-        CHUNK = 1024              #wav文件是由若干个CHUNK组成的，CHUNK我们就理解成数据包或者数据片段。1024
+        CHUNK = 1024             
         FORMAT = pyaudio.paInt16  #这个参数后面写的pyaudio.paInt16表示我们使用量化位数 16位来进行录音。
-        CHANNELS = 1              #代表的是声道，这里使用的单声道。 1
+        CHANNELS = 1              
         RATE = 16000              # 采样率16k
         #RECORD_SECONDS = Time     #采样时间
         WAVE_OUTPUT_FILENAME = 'recode22.wav'   #输出文件名
